@@ -98,7 +98,7 @@
   }
 
   body {
-    background-color: var(--color-background);
+    background-color: transparent;
     color: var(--color-foreground);
   }
 
@@ -121,7 +121,7 @@
     background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.95), rgba(200,210,220,0.55) 60%, rgba(200,210,220,0) 80%);
     pointer-events: none;
     transform: translate(-50%, -50%);
-    animation: smoke-rise 1.6s ease-out forwards;
+    animation: smoke-rise 1.8s ease-out forwards;
     filter: blur(1px);
   }
 
@@ -130,5 +130,25 @@
     60%  { opacity: 0.5; }
     100% { opacity: 0;   transform: translate(-50%, -160%) scale(2.4); }
   }
+
+  .sky-bg {
+    background: linear-gradient(to bottom, #bfe6f7 0%, #dff2fb 50%, #f5fbff 100%);
+  }
+
+  @keyframes cloud-drift {
+    from { transform: translateX(-20vw); }
+    to   { transform: translateX(120vw); }
+  }
+  @keyframes cloud-drift-slow {
+    from { transform: translateX(-30vw); }
+    to   { transform: translateX(120vw); }
+  }
+
+  .cloud-a { animation: cloud-drift 60s linear infinite; }
+  .cloud-b { animation: cloud-drift-slow 90s linear infinite; animation-delay: -20s; }
+  .cloud-c { animation: cloud-drift 75s linear infinite; animation-delay: -40s; }
+  .cloud-d { animation: cloud-drift-slow 110s linear infinite; animation-delay: -10s; }
+  .cloud-e { animation: cloud-drift 85s linear infinite; animation-delay: -55s; }
 }
+
 
