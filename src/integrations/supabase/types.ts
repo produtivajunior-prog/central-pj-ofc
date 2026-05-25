@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      links: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          icon_name: string
+          id: string
+          sort_order: number
+          title: string
+          url: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          icon_name: string
+          id?: string
+          sort_order?: number
+          title: string
+          url: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          icon_name?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          url?: string
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_name: string
