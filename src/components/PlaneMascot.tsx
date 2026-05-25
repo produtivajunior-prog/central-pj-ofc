@@ -17,37 +17,27 @@ export function PlaneMascot() {
       if (!el) return;
       const rect = el.getBoundingClientRect();
       const id = ++idRef.current;
-      // emit slightly behind (left) of the plane
       const x = rect.left + rect.width * 0.18;
       const y = rect.top + rect.height * 0.65;
       setPuffs((p) => [...p, { id, x, y }]);
-      setTimeout(() => setPuffs((p) => p.filter((q) => q.id !== id)), 1600);
-    }, 140);
+      setTimeout(() => setPuffs((p) => p.filter((q) => q.id !== id)), 1800);
+    }, 160);
     return () => clearInterval(interval);
   }, [reduced]);
 
-  if (reduced) {
-    return (
-      <img
-        src={planeImg}
-        alt=""
-        aria-hidden
-        className="pointer-events-none fixed bottom-6 right-6 z-30 h-20 w-20 opacity-90"
-      />
-    );
-  }
-
-  // Trajetória cobrindo cantos da tela usando vw/vh strings
-  const path = {
-    x: ["5vw", "60vw", "80vw", "70vw", "20vw", "5vw"],
-    y: ["70vh", "20vh", "55vh", "80vh", "30vh", "70vh"],
-    rotate: [0, 8, -6, 10, -8, 0],
-  };
-
   return (
     <>
+      {/* Sky background + clouds (behind everything) */}
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden sky-bg">
+        <Cloud className="cloud-a" top="8%" size={160} />
+        <Cloud className="cloud-b" top="22%" size={110} />
+        <Cloud className="cloud-c" top="45%" size={200} />
+        <Cloud className="cloud-d" top="65%" size={130} />
+        <Cloud className="cloud-e" top="80%" size={170} />
+      </div>
+
       {/* Smoke puffs */}
-      <div className="pointer-events-none fixed inset-0 z-30">
+      <div className="pointer-events-none fixed inset-0 z-0">
         {puffs.map((p) => (
           <span
             key={p.id}
@@ -57,28 +47,67 @@ export function PlaneMascot() {
         ))}
       </div>
 
-      {/* Plane */}
-      <motion.div
-        ref={planeRef}
-        className="pointer-events-none fixed left-0 top-0 z-30"
-        initial={{ x: "5vw", y: "70vh" }}
-        animate={path}
-        transition={{
-          duration: 28,
-          repeat: Infinity,
-          ease: "easeInOut",
-          times: [0, 0.2, 0.4, 0.6, 0.8, 1],
-        }}
-      >
-        <motion.img
+      {/* Plane flying behind content */}
+      {reduced ? (
+        <img
           src={planeImg}
           alt=""
           aria-hidden
-          className="h-20 w-20 drop-shadow-lg select-none"
-          animate={{ y: [0, -6, 0, 6, 0], rotate: [-3, 3, -3] }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          className="pointer-events-none fixed bottom-10 right-10 z-0 h-24 w-24 opacity-90"
         />
-      </motion.div>
+      ) : (
+        <motion.div
+          ref={planeRef}
+          className="pointer-events-none fixed left-0 top-0 z-0"
+          initial={{ x: "5vw", y: "70vh" }}
+          animate={{
+            x: ["5vw", "60vw", "80vw", "70vw", "20vw", "5vw"],
+            y: ["70vh", "20vh", "55vh", "80vh", "30vh", "70vh"],
+          }}
+          transition={{
+            duration: 32,
+            repeat: Infinity,
+            ease: "easeInOut",
+            times: [0, 0.2, 0.4, 0.6, 0.8, 1],
+          }}
+        >
+          <motion.img
+            src={planeImg}
+            alt=""
+            aria-hidden
+            width={96}
+            height={96}
+            className="h-24 w-24 select-none drop-shadow-xl"
+            animate={{ y: [0, -8, 0, 8, 0], rotate: [-4, 4, -4] }}
+            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
+      )}
     </>
+  );
+}
+
+function Cloud({
+  className = "",
+  top,
+  size,
+}: {
+  className?: string;
+  top: string;
+  size: number;
+}) {
+  return (
+    <svg
+      className={`absolute opacity-90 ${className}`}
+      style={{ top, width: size, height: size * 0.6 }}
+      viewBox="0 0 200 120"
+      fill="white"
+      aria-hidden
+    >
+      <ellipse cx="60" cy="80" rx="50" ry="30" />
+      <ellipse cx="110" cy="65" rx="55" ry="38" />
+      <ellipse cx="155" cy="85" rx="40" ry="28" />
+      <ellipse cx="90" cy="90" rx="60" ry="25" />
+    </svg>
   );
 }

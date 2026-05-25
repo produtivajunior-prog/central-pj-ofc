@@ -125,10 +125,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="relative min-h-screen overflow-hidden bg-background">
-        <Header />
-        <Outlet />
+      <div className="relative min-h-screen">
         <PlaneMascot />
+        <Header />
+        <div className="relative z-10">
+          <Outlet />
+        </div>
       </div>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
