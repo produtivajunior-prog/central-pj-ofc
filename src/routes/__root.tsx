@@ -88,6 +88,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Central PJ — Produtiva Junior" },
+      { name: "description", content: "Produtiva Hub is a centralized platform for accessing key resources and sharing project updates." },
+      { property: "og:description", content: "Produtiva Hub is a centralized platform for accessing key resources and sharing project updates." },
+      { name: "twitter:description", content: "Produtiva Hub is a centralized platform for accessing key resources and sharing project updates." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/40ec8764-0b87-4bb4-847d-e7fbd3be19a2/id-preview-7b9b11cb--1b378aca-12f1-43cd-b40b-69ac1465cffb.lovable.app-1779725761917.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/40ec8764-0b87-4bb4-847d-e7fbd3be19a2/id-preview-7b9b11cb--1b378aca-12f1-43cd-b40b-69ac1465cffb.lovable.app-1779725761917.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
