@@ -10,6 +10,7 @@ import {
 
 import appCss from "../styles.css?url";
 import { Header } from "@/components/Header";
+import { PlaneMascot } from "@/components/PlaneMascot";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -74,13 +75,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Produtiva Junior — Central Interna" },
+      { title: "Central PJ — Produtiva Junior" },
       {
         name: "description",
         content:
-          "Central de links e feed interno da Produtiva Junior: acesso rápido aos formulários e novidades dos projetos.",
+          "Central PJ: links rápidos e feed interno da Produtiva Junior em um só lugar.",
       },
-      { property: "og:title", content: "Produtiva Junior — Central Interna" },
+      { property: "og:title", content: "Central PJ — Produtiva Junior" },
       {
         property: "og:description",
         content: "Links importantes e feed de novidades da Produtiva Junior.",
@@ -124,9 +125,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background">
+      <div className="relative min-h-screen overflow-hidden bg-background">
         <Header />
         <Outlet />
+        <PlaneMascot />
       </div>
       <Toaster richColors position="top-center" />
     </QueryClientProvider>

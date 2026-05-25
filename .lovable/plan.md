@@ -1,72 +1,71 @@
-## Visão geral
-Sistema com duas páginas para a Produtiva Junior:
-1. **Landing (`/`)** — grade visual de cards com os 14 links institucionais, cada um com ícone temático.
-2. **Feed (`/feed`)** — mural estilo LinkedIn onde qualquer pessoa pode publicar (sem login), com foto, título, descrição e nome do autor.
+# Plano — Central PJ v2
 
-Header compartilhado com o ícone azul como logo + navegação entre as duas páginas.
+## 1. Renomear o sistema para "Central PJ"
+- `src/components/Header.tsx`: trocar "Produtiva Junior" / "Central interna" por **"Central PJ"** + subtítulo "Produtiva Junior".
+- `src/routes/__root.tsx` e `src/routes/index.tsx`: atualizar `<title>`, meta description e o `<h1>` do hero.
 
-## Design
-- Paleta Azul Produtiva: `#7EC8D3` (primary/accent do ícone), `#4A9FB8` (primary hover), `#0F2A44` (foreground/navy), `#F5F7FA` (background). Tokens em `src/styles.css` (oklch).
-- Tipografia: Inter (corpo) + Space Grotesk (títulos), via Google Fonts.
-- Layout: card-grid responsivo (1/2/3/4 colunas).
-- Ícone enviado vira `public/logo.png` + favicon, usado no header.
+## 2. Novo link
+- Adicionar em `src/lib/links.ts` (usado como seed inicial):
+  - **Funil de Ideias de Inovação** — `https://funildeinovação.produtivajunior.com.br` — ícone `Rocket` — categoria "Inovação".
 
-## Página 1 — Landing `/`
-- Header: logo + nome "Produtiva Junior" + nav (Início / Feed).
-- Hero curto: título "Central de Links" + subtítulo.
-- Grid de cards (um por link), cada card com:
-  - Ícone Lucide temático (ver mapa abaixo)
-  - Título do link
-  - Botão "Acessar" abrindo em nova aba
+## 3. Login de administrador (simples, sem cadastro)
+Como é uma credencial única e compartilhada, **não** vou usar o sistema de auth do Cloud (que exige conta por usuário). Vou implementar uma verificação local:
 
-Mapa link → ícone (lucide-react):
-- Indicação de Leads → `UserPlus`
-- Processo de Pagamentos → `CreditCard`
-- Plano de Punição → `AlertTriangle`
-- Reembolso Gasolina → `Fuel`
-- Capacitação → `GraduationCap`
-- Indicações Projetos → `Briefcase`
-- Hangar Academy → `BookOpen`
-- Formulário Milhas PJ → `Plane`
-- Dashboard Milhas PJ → `BarChart3`
-- ChatGPT → `Sparkles`
-- Reserva Computadores → `Laptop`
-- Sugestões de Inovações → `Lightbulb`
-- Gamificação PTPJ → `Trophy`
-- Formulário de Ausências → `CalendarX`
+- Credencial fixa no código:
+  - email: `admin@produtivajunior.com.br`
+  - senha: `produtivajr12`
+- Nova rota `/login` com formulário (email + senha).
+  - Se OK → salva `centralpj_admin = "1"` em `localStorage` e redireciona para `/`.
+  - Se errado → mostra erro.
+- Hook `useAdmin()` lê o flag do localStorage e expõe `isAdmin` + `logout()`.
+- Tela inicial **continua pública** (qualquer um acessa sem login). O botão "Entrar como admin" fica no header; quando logado, vira "Sair" + badge "Admin".
 
-## Página 2 — Feed `/feed`
-- Composer no topo: campos Nome do autor, Título, Descrição, upload de foto, botão "Publicar".
-- Lista de posts (mais recentes primeiro), cada post como card estilo LinkedIn:
-  - Avatar (inicial do nome) + nome do autor + data relativa
-  - Título em destaque
-  - Texto descritivo
-  - Imagem da postagem
+> Observação: como a senha fica embutida no bundle JS, qualquer pessoa com acesso ao código-fonte pode lê-la. Isso é aceitável para um "modo edição" interno, mas não é segurança real. Se no futuro quiser proteção de verdade, migramos para Lovable Cloud Auth.
 
-## Backend (Lovable Cloud, sem login)
-- Tabela `posts`: `id uuid`, `author_name text`, `title text`, `description text`, `image_url text`, `created_at timestamptz`.
-- RLS: `SELECT` público, `INSERT` público (sem auth), sem `UPDATE`/`DELETE` por enquanto.
-- Storage bucket público `post-images` para as fotos.
-- Leitura/escrita via server functions TanStack Start (`createServerFn`) + TanStack Query no client.
+## 4. Links editáveis pelo admin
+Mover os links do arquivo estático para o banco para que edições persistam para todo mundo.
 
-## Detalhes técnicos
-- Rotas TanStack: `src/routes/index.tsx` (landing) e `src/routes/feed.tsx` (feed), cada uma com `head()` próprio (title/description/og).
-- Header compartilhado em `src/routes/__root.tsx` acima do `<Outlet />`.
-- Dados dos links num array em `src/lib/links.ts` para fácil manutenção.
-- Server functions em `src/lib/posts.functions.ts` (`listPosts`, `createPost`) usando `supabaseAdmin` (já que não há auth).
-- Upload de imagem: client envia para Storage via supabase-js (publishable key), depois chama `createPost` com a URL.
-- Componentes shadcn existentes: Card, Button, Input, Textarea, Avatar.
+- Migration:
+  - Tabela `links` (id, title, description, url, icon_name, category, sort_order, created_at).
+  - RLS: leitura pública (`SELECT` para todos); `INSERT/UPDATE/DELETE` liberados (a checagem de admin é feita no client). 
+  - Seed com os 15 links atuais (14 existentes + Funil de Inovação).
+- `src/lib/links.ts` vira apenas o mapa `icon_name → LucideIcon` + tipos.
+- `listLinks` e (apenas para admin) `upsertLink` / `deleteLink` como `createServerFn`.
+- Página inicial usa `useSuspenseQuery(listLinks)` em vez do array estático.
+- Quando `isAdmin === true`:
+  - Cada `LinkCard` ganha botões **Editar** / **Excluir** no hover.
+  - Botão flutuante **"+ Novo link"** abre dialog (shadcn `Dialog` + `Form`) com campos título, descrição, URL, categoria e seletor de ícone (lista curada de ~30 ícones Lucide).
+  - Submeter chama o server fn e invalida a query.
 
-## Arquivos a criar/alterar
-- `src/styles.css` — tokens da paleta azul + fontes
-- `src/routes/__root.tsx` — header + nav + meta global
-- `src/routes/index.tsx` — landing com grid de links
-- `src/routes/feed.tsx` — feed
-- `src/lib/links.ts` — dados dos 14 links
-- `src/lib/posts.functions.ts` — server fns
-- `src/components/Header.tsx`, `src/components/LinkCard.tsx`, `src/components/PostCard.tsx`, `src/components/PostComposer.tsx`
-- `public/logo.png` (cópia do ícone enviado) + favicon
-- Migration SQL: tabela `posts` + bucket `post-images` + policies
+## 5. Mascote avião animado com fumaça
+- Copiar imagem enviada para `src/assets/aviao-mascote.png`.
+- Novo componente `PlaneMascot.tsx` posicionado `fixed inset-0 pointer-events-none z-30`:
+  - Avião (80px) animado com **Framer Motion** (já bem suportado) percorrendo uma rota suave pela tela: keyframes em `x`, `y` e leve `rotate`, `duration: 25s`, `repeat: Infinity`, `ease: easeInOut`. A trajetória cobre cantos diferentes para parecer que ele "explora" o sistema.
+  - **Rastro de fumaça**: a cada ~120 ms emite uma `div` circular branca/cinza atrás do avião, que faz fade-out + scale-up + leve drift para cima em ~1.5s (animação CSS keyframes em `styles.css`). Implementado com estado local `puffs: {id,x,y}[]` e `setTimeout` para remover.
+  - Leve "balanço" (rotate ±5°) num loop curto para dar vida.
+- Montado em `__root.tsx` para aparecer em todas as páginas (inclui Feed). Não aparece em `/login` (rota cheia de formulário).
+- Respeita `prefers-reduced-motion`: se ativo, mostra o avião parado num canto sem fumaça.
 
-## Fora do escopo (posso adicionar depois)
-- Login/autenticação, curtidas/comentários, edição/exclusão de posts, moderação.
+## Arquivos a criar/editar
+
+**Criar**
+- `src/assets/aviao-mascote.png` (cópia do upload)
+- `src/routes/login.tsx`
+- `src/hooks/useAdmin.ts`
+- `src/components/PlaneMascot.tsx`
+- `src/components/admin/LinkFormDialog.tsx`
+- `src/lib/links.functions.ts` (list/upsert/delete)
+- `supabase/migrations/<novo>.sql` (tabela `links` + seed)
+
+**Editar**
+- `src/components/Header.tsx` (nome + botão login/sair)
+- `src/components/LinkCard.tsx` (ações admin)
+- `src/lib/links.ts` (vira mapa de ícones)
+- `src/routes/__root.tsx` (montar `PlaneMascot`, atualizar meta)
+- `src/routes/index.tsx` (carregar links do banco, botão "+ Novo link", título "Central PJ")
+- `src/styles.css` (keyframes da fumaça)
+
+## Fora de escopo
+- Auth real multi-usuário, recuperação de senha.
+- Permissão de edição no Feed (continua público como hoje).
+- Reordenar links via drag-and-drop (a tabela já tem `sort_order` para evoluir depois).
