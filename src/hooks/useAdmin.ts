@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 
 const KEY = "centralpj_admin";
-const ADMIN_EMAIL = "admin@produtivajunior.com.br";
+const ADMIN_EMAIL = "produtivajunior@gmail.com";
 const ADMIN_PASSWORD = "produtivajr12";
 
 export function useAdmin() {
