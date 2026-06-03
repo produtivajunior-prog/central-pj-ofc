@@ -91,10 +91,11 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
   }
 
   html, body {
-    font-family: var(--font-sans);
+    font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
   }
 
   body {
@@ -103,7 +104,7 @@
   }
 
   h1, h2, h3, h4 {
-    font-family: var(--font-display);
+    font-family: "Poppins", ui-sans-serif, system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
 }
