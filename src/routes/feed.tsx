@@ -3,16 +3,18 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 import { listPosts } from "@/lib/posts.functions";
 import { PostComposer } from "@/components/PostComposer";
 import { PostCard } from "@/components/PostCard";
+import { useVisitorId } from "@/hooks/useVisitorId";
 
-const postsQueryOptions = queryOptions({
-  queryKey: ["posts"],
-  queryFn: () => listPosts(),
-});
+const postsQueryOptions = (visitorId: string | null) =>
+  queryOptions({
+    queryKey: ["posts", visitorId ?? "anon"],
+    queryFn: () => listPosts({ data: { visitor_id: visitorId ?? undefined } }),
+  });
 
 export const Route = createFileRoute("/feed")({
   head: () => ({
     meta: [
-      { title: "Feed — Produtiva Junior" },
+      { title: "Feed — Central PJ" },
       {
         name: "description",
         content:
@@ -20,12 +22,13 @@ export const Route = createFileRoute("/feed")({
       },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(postsQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(postsQueryOptions(null)),
   component: FeedPage,
 });
 
 function FeedPage() {
-  const { data } = useSuspenseQuery(postsQueryOptions);
+  const visitorId = useVisitorId();
+  const { data } = useSuspenseQuery(postsQueryOptions(visitorId));
 
   return (
     <main className="mx-auto max-w-2xl px-4 pb-20 pt-8 sm:px-6">
