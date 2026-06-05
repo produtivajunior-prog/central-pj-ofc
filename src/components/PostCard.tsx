@@ -53,6 +53,7 @@ export function PostCard({ post }: { post: Post }) {
   const reactFn = useServerFn(setReaction);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const delMut = useMutation({
     mutationFn: () => deleteFn({ data: { id: post.id, admin_password: getAdminPassword() } }),
