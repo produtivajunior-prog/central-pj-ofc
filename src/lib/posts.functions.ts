@@ -2,7 +2,15 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export type ReactionType = "like" | "love" | "wow" | "clap" | "think";
+export type ReactionType = "like" | "love" | "haha" | "wow" | "clap" | "think";
+
+export type Comment = {
+  id: string;
+  post_id: string;
+  author_name: string;
+  content: string;
+  created_at: string;
+};
 
 export type Post = {
   id: string;
