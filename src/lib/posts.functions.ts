@@ -151,3 +151,60 @@ export const setReaction = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const listComments = createServerFn({ method: "POST" })
+  .inputValidator((input) => z.object({ post_id: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => {
+    const { data: rows, error } = await supabaseAdmin
+      .from("post_comments")
+      .select("id, post_id, author_name, content, created_at")
+      .eq("post_id", data.post_id)
+      .order("created_at", { ascending: true })
+      .limit(500);
+    if (error) {
+      console.error("listComments error", error);
+      return { comments: [] as Comment[], error: "Não foi possível carregar os comentários." };
+    }
+    return { comments: rows as Comment[], error: null };
+  });
+
+export const createComment = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({
+      post_id: z.string().uuid(),
+      visitor_id: z.string().min(1).max(100),
+      author_name: z.string().min(1).max(80),
+      content: z.string().min(1).max(1000),
+    }).parse(input)
+  )
+  .handler(async ({ data }) => {
+    const { data: row, error } = await supabaseAdmin
+      .from("post_comments")
+      .insert({
+        post_id: data.post_id,
+        visitor_id: data.visitor_id,
+        author_name: data.author_name.trim(),
+        content: data.content.trim(),
+      })
+      .select("id, post_id, author_name, content, created_at")
+      .single();
+    if (error) {
+      console.error("createComment error", error);
+      throw new Error("Falha ao comentar.");
+    }
+    return { comment: row as Comment };
+  });
+
+export const deleteComment = createServerFn({ method: "POST" })
+  .inputValidator((input) =>
+    z.object({
+      id: z.string().uuid(),
+      admin_password: z.string().min(1).max(100),
+    }).parse(input)
+  )
+  .handler(async ({ data }) => {
+    if (data.admin_password !== ADMIN_PASSWORD) throw new Error("Permissão negada.");
+    const { error } = await supabaseAdmin.from("post_comments").delete().eq("id", data.id);
+    if (error) throw new Error("Falha ao excluir comentário.");
+    return { ok: true };
+  });
