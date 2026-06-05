@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Trash2 } from "lucide-react";
+import { MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Post, ReactionType } from "@/lib/posts.functions";
 import { deletePost, setReaction } from "@/lib/posts.functions";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useVisitorId } from "@/hooks/useVisitorId";
+import { Comments } from "@/components/Comments";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +23,7 @@ import {
 const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
   { type: "like", emoji: "👍", label: "Curtir" },
   { type: "love", emoji: "❤️", label: "Amei" },
+  { type: "haha", emoji: "😂", label: "Engraçado" },
   { type: "wow", emoji: "😮", label: "Uau" },
   { type: "clap", emoji: "👏", label: "Parabéns" },
   { type: "think", emoji: "🤔", label: "Interessante" },
