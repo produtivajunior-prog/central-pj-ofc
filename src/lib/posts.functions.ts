@@ -53,7 +53,7 @@ export const listPosts = createServerFn({ method: "POST" })
 
       for (const r of reactions ?? []) {
         const counts = (reactionMap[r.post_id] ??= {
-          like: 0, love: 0, wow: 0, clap: 0, think: 0,
+          like: 0, love: 0, haha: 0, wow: 0, clap: 0, think: 0,
         });
         counts[r.reaction_type as ReactionType] += 1;
         if (data.visitor_id && r.visitor_id === data.visitor_id) {
@@ -64,7 +64,7 @@ export const listPosts = createServerFn({ method: "POST" })
 
     const enriched: Post[] = (posts ?? []).map((p) => ({
       ...p,
-      reactions: reactionMap[p.id] ?? { like: 0, love: 0, wow: 0, clap: 0, think: 0 },
+      reactions: reactionMap[p.id] ?? { like: 0, love: 0, haha: 0, wow: 0, clap: 0, think: 0 },
       my_reaction: mineMap[p.id] ?? null,
     }));
 
