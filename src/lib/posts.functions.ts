@@ -123,7 +123,7 @@ export const setReaction = createServerFn({ method: "POST" })
     z.object({
       post_id: z.string().uuid(),
       visitor_id: z.string().min(1).max(100),
-      reaction_type: z.enum(["like", "love", "wow", "clap", "think"]).nullable(),
+      reaction_type: z.enum(["like", "love", "haha", "wow", "clap", "think"]).nullable(),
     }).parse(input)
   )
   .handler(async ({ data }) => {
