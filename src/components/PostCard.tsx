@@ -161,7 +161,7 @@ export function PostCard({ post }: { post: Post }) {
       )}
 
       <div
-        className="relative border-t border-border px-2 py-1"
+        className="relative flex items-center gap-1 border-t border-border px-2 py-1"
         onMouseLeave={() => setHover(false)}
       >
         <button
@@ -173,6 +173,14 @@ export function PostCard({ post }: { post: Post }) {
         >
           <span className="text-base">{myReaction?.emoji ?? "👍"}</span>
           {myReaction?.label ?? "Reagir"}
+        </button>
+
+        <button
+          onClick={() => setShowComments((v) => !v)}
+          className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Comentar
         </button>
 
         {hover && (
@@ -193,6 +201,8 @@ export function PostCard({ post }: { post: Post }) {
           </div>
         )}
       </div>
+
+      {showComments && <Comments postId={post.id} />}
     </article>
   );
 }
