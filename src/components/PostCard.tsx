@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Trash2 } from "lucide-react";
+import { MessageCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Post, ReactionType } from "@/lib/posts.functions";
 import { deletePost, setReaction } from "@/lib/posts.functions";
 import { useAdmin } from "@/hooks/useAdmin";
 import { useVisitorId } from "@/hooks/useVisitorId";
+import { Comments } from "@/components/Comments";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +23,7 @@ import {
 const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
   { type: "like", emoji: "👍", label: "Curtir" },
   { type: "love", emoji: "❤️", label: "Amei" },
+  { type: "haha", emoji: "😂", label: "Engraçado" },
   { type: "wow", emoji: "😮", label: "Uau" },
   { type: "clap", emoji: "👏", label: "Parabéns" },
   { type: "think", emoji: "🤔", label: "Interessante" },
@@ -51,6 +53,7 @@ export function PostCard({ post }: { post: Post }) {
   const reactFn = useServerFn(setReaction);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const delMut = useMutation({
     mutationFn: () => deleteFn({ data: { id: post.id, admin_password: getAdminPassword() } }),
@@ -158,7 +161,7 @@ export function PostCard({ post }: { post: Post }) {
       )}
 
       <div
-        className="relative border-t border-border px-2 py-1"
+        className="relative flex items-center gap-1 border-t border-border px-2 py-1"
         onMouseLeave={() => setHover(false)}
       >
         <button
@@ -170,6 +173,14 @@ export function PostCard({ post }: { post: Post }) {
         >
           <span className="text-base">{myReaction?.emoji ?? "👍"}</span>
           {myReaction?.label ?? "Reagir"}
+        </button>
+
+        <button
+          onClick={() => setShowComments((v) => !v)}
+          className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Comentar
         </button>
 
         {hover && (
@@ -190,6 +201,8 @@ export function PostCard({ post }: { post: Post }) {
           </div>
         )}
       </div>
+
+      {showComments && <Comments postId={post.id} />}
     </article>
   );
 }
